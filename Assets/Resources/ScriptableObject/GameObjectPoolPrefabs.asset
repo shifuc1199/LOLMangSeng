@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31dec76640397f94893686ce33be5e7c, type: 3}
+  m_Name: GameObjectPoolPrefabs
+  m_EditorClassIdentifier: 
+  Prefabs:
+  - prefab_name: click_move
+    prefab: {fileID: 3466031218344580504, guid: f3e1a77068d244b489f4b0989a0bf725,
+      type: 3}
+  - prefab_name: skill_q_projectile
+    prefab: {fileID: 3218672173332142029, guid: 9bd6df9d4d6680b43aa548a7f894f840,
+      type: 3}
+  - prefab_name: flash_effect
+    prefab: {fileID: 9068818151124872000, guid: 7d8568b8b5b19174f81c3be660cdf7e1,
+      type: 3}
+  - prefab_name: flash_effect2
+    prefab: {fileID: 9068818151124872000, guid: 240c9f079ff8f744b9a8dbe23bfecba1,
+      type: 3}
