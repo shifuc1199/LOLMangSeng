@@ -15,3 +15,5 @@ MonoBehaviour:
   Clips:
   - id: flash
     clip: {fileID: 8300000, guid: 887fbc7d7250daa46aee7c14c7f1511d, type: 3}
+  - id: skill_r
+    clip: {fileID: 8300000, guid: 0484a90c4738fc943b3975ca050121ed, type: 3}

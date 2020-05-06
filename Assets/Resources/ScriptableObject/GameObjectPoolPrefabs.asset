@@ -25,3 +25,5 @@ MonoBehaviour:
   - prefab_name: flash_effect2
     prefab: {fileID: 9068818151124872000, guid: 240c9f079ff8f744b9a8dbe23bfecba1,
       type: 3}
+  - prefab_name: skill_r
+    prefab: {fileID: 100004, guid: 5b52f1ff89b4dc94087ad66d49be9d6b, type: 3}
