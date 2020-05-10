@@ -27,3 +27,8 @@ MonoBehaviour:
       type: 3}
   - prefab_name: skill_r
     prefab: {fileID: 100004, guid: 5b52f1ff89b4dc94087ad66d49be9d6b, type: 3}
+  - prefab_name: hit
+    prefab: {fileID: 100002, guid: 94d68b1b34324d44698e0e4ed7d69032, type: 3}
+  - prefab_name: skill_q_hit
+    prefab: {fileID: 1225301697868983358, guid: 6f3adf07ce8033a43812259fb64484a4,
+      type: 3}

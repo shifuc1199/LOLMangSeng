@@ -23,7 +23,7 @@ public class AudioManager : MonoSingleton<AudioManager>
     public void PlayOneShot(string audio_name)
     {
         var clip = clips.GetClip(audio_name);
-       // _audio.pitch = Random.Range(1.0f, 2.0f);
+        
         _audio.PlayOneShot(clip);
     }
 }

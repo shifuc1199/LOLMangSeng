@@ -17,3 +17,15 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 887fbc7d7250daa46aee7c14c7f1511d, type: 3}
   - id: skill_r
     clip: {fileID: 8300000, guid: 0484a90c4738fc943b3975ca050121ed, type: 3}
+  - id: attack
+    clip: {fileID: 8300000, guid: 6d79054cb60ec3f498edf91b75feeedf, type: 3}
+  - id: skill_q
+    clip: {fileID: 8300000, guid: 80d7651de2f71974680da843c59a650b, type: 3}
+  - id: skill_q_hit
+    clip: {fileID: 8300000, guid: 60b5fd01adbe93f40951c4bb55d9b5c5, type: 3}
+  - id: skill_w
+    clip: {fileID: 8300000, guid: dcd61e232b2f9b74093e445ee6988303, type: 3}
+  - id: skill_q_2
+    clip: {fileID: 8300000, guid: 249af46c39332424b846bf27f21dbb8e, type: 3}
+  - id: eye
+    clip: {fileID: 8300000, guid: ba383b308008118439cd5cf1f5d0982a, type: 3}

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GameScene : MonoBehaviour
 {
-    public UnitController controlUnit;
+    public HeroUnitController controlUnit;
     // Start is called before the first frame update
     void Awake()
     {

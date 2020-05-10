@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitController : MonoBehaviour
+public class HeroUnitController : MonoBehaviour
 {
 
-    public Unit unit{ get; private set; }
+    public HeroUnit unit { get; private set; }
     // Start is called before the first frame update
     void Awake()
     {

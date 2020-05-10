@@ -3,20 +3,124 @@ using System.Collections.Generic;
 using UnityEngine;
 using DreamerTool.Singleton;
 using DreamerTool.GameObjectPool;
+using UnityEngine.Events;
+public class SkillModel
+{
+    private Vector3 skillDir;
+    private Unit skillTarget;
+    public Unit GetSkillTarget()
+    {
+        return skillTarget;
+    }
+    public Vector3 GetSkillDir()
+    {
+        return skillDir;
+    }
+    public void SetSkillTarget(Unit skillTarget, UnityAction<Unit> callBack=null)
+    {
+        if(skillTarget == null)
+        {
+            callBack?.Invoke(skillTarget);
+            this.skillTarget = skillTarget;
+        }
+        else
+        {
+            this.skillTarget = skillTarget;
+            callBack?.Invoke(skillTarget);
+        }
+              
+    }
+    public void SetSkillDir(Vector3 skillDir)
+    {
+        this.skillDir = skillDir;
+    }
+}
+public class Status
+{
+    public UnityAction<CallBackType> CallBack;
+  
+    public Status(UnityAction<CallBackType> CallBack)
+    {
+        this.CallBack = CallBack;
+    }
+}
 public class HeroUnit : Unit
 {
     public HeroState heroState = HeroState.Idle;
+    
     protected Animator anim;
     protected Rigidbody rigi;
 
     Vector3 aimPos;
-    HeroUnit enemyUnit;
+    public Unit selectEnemyUnit { get; private set; }
+    public Dictionary<StatusType, Status>  statusDict = new Dictionary<StatusType, Status>();
+    public Dictionary<SkillType, SkillModel> skillDict = new Dictionary<SkillType, SkillModel>() {
+        { SkillType.Q,new SkillModel()},
+        { SkillType.W,new SkillModel()}
+    };
+    public void RemoveStatus(StatusType status)
+    {
+        if (!statusDict.ContainsKey(status))
+        {
+            return;
+        }
+        else
+        {
+ 
+            statusDict[status].CallBack?.Invoke(CallBackType.Remove);
+            statusDict.Remove(status);
+        }
+    }
+    public void SetStatus(StatusType statusType,Status status)
+    {
+        if(!statusDict.ContainsKey(statusType))
+        {
+            
+            statusDict.Add(statusType, status);
+            statusDict[statusType].CallBack?.Invoke(CallBackType.Add);
+        }
+        else
+        {
+     
+            statusDict[statusType] = status;
+            statusDict[statusType].CallBack?.Invoke(CallBackType.Add);
+        }
+    }
     public HeroUnit(Transform transform, Animator anim = null, Rigidbody rigi = null) : base(transform)
     {
         this.rigi = rigi;
         this.anim = anim;
     }
- 
+    public void SetGetStatus()
+    {
+        GameObjectPoolManager.GetPool("skill_q_hit").Get(transform, 3);
+    }
+    public virtual void ExcuteSkill(SkillType skillType, object[] skillParam)
+    {
+        SetHeroState(HeroState.Idle);
+       // var skillExcuteType = (SkillExcuteType)skillParam[0];
+        switch (skillType)
+        {
+            case SkillType.Q:
+                if(skillDict[SkillType.Q].GetSkillTarget() != null)
+                {
+                    PlayAnim(AnimParamType.Trigger, skillType.ToString()+"_2");
+                    return;
+                }
+                skillDict[SkillType.Q].SetSkillDir((Vector3)skillParam[1]);
+                break;
+            case SkillType.W:
+                skillDict[SkillType.W].SetSkillTarget(skillParam[1] as Unit);
+                break;
+            case SkillType.E:
+                break;
+            case SkillType.R:
+                break;
+            default:
+                break;
+        }
+        PlayAnim(AnimParamType.Trigger, skillType.ToString());
+    }
     public void PlayAnim(AnimParamType apt,params object[] param)
     {
         if (anim == null)
@@ -36,41 +140,44 @@ public class HeroUnit : Unit
                 break;
         }
     }
-  
+    public void MoveTo(Vector3 pos,float speed)
+    {
+        transform.MoveTo(pos, speed);
+    }
     public override void MoveTo(Vector3 aimPos)
     {
-        GameObjectPoolManager.GetPool("click_move").Get(aimPos, Quaternion.identity, 1);
         this.aimPos = aimPos;
-        heroState = HeroState.Run;
-        PlayAnim(AnimParamType.Bool, "run", true);
+        SetHeroState(HeroState.Run);
     }
     public void SetHeroState(HeroState state, params object[] param)
     {
         switch (state)
         {
             case HeroState.Idle:
+                PlayAnim(AnimParamType.Bool, "run", false);
                 break;
             case HeroState.Run:
+                PlayAnim(AnimParamType.Bool, "run", true);
                 break;
             case HeroState.Attack:
-                enemyUnit = (param[0] as HeroUnit);
+                selectEnemyUnit = param[0] as Unit;
                 break;
             default:
                 break;
         }
         heroState = state;
     }
-    public override void SetPos(Vector3 aimPos)
+    public void Flash(Vector3 aimPos)
     {
         AudioManager.Instance.PlayOneShot("flash");
-        GameObjectPoolManager.GetPool("flash_effect").Get(transform.position, Quaternion.identity,2);
+        GameObjectPoolManager.GetPool("flash_effect").Get(transform.position, Quaternion.identity, 2);
         transform.forward = (aimPos - transform.position).normalized;
-        transform.position = aimPos;
+        base.SetPos(aimPos);
         GameObjectPoolManager.GetPool("flash_effect2").Get(transform.position, Quaternion.identity, 2);
     }
 
 
-    float timer;
+    float timer=1;
 
     public override void Update()
     {
@@ -82,15 +189,15 @@ public class HeroUnit : Unit
             case HeroState.Run:
                 if(Vector3.Distance(transform.position,aimPos)<=0.1f)
                 {
-                    PlayAnim(AnimParamType.Bool, "run", false);
-                    heroState = HeroState.Idle;
+                    SetHeroState(HeroState.Idle);
                     return;
                 }
                 transform.forward = Vector3.Slerp(transform.forward, (aimPos - transform.position).normalized, Time.deltaTime * 20);
                 transform.position = Vector3.MoveTowards(transform.position, aimPos, Time.deltaTime * 2.5f);
                 break;
             case HeroState.Attack:
-                if (Vector3.Distance(transform.position, enemyUnit.GetPos()) <= 1.5f)
+                transform.forward = Vector3.Slerp(transform.forward, (selectEnemyUnit.GetPosNoY() - transform.position).normalized, Time.deltaTime * 20);
+                if (Vector3.Distance(transform.position, selectEnemyUnit.GetPos()) <= 2f)
                 {
                     PlayAnim(AnimParamType.Bool, "run", false);
                     timer += Time.deltaTime;
@@ -102,9 +209,8 @@ public class HeroUnit : Unit
                     return;
                 }
                 PlayAnim(AnimParamType.Bool, "run", true);
-     
-                transform.forward = Vector3.Slerp(transform.forward, (enemyUnit.GetPosNoY() - transform.position).normalized, Time.deltaTime * 20);
-                transform.position = Vector3.MoveTowards(transform.position, enemyUnit.GetPosNoY(), Time.deltaTime * 2.5f);
+                 
+                transform.position = Vector3.MoveTowards(transform.position, selectEnemyUnit.GetPosNoY(), Time.deltaTime * 2.5f);
                 break;
             default:
                 break;
@@ -118,6 +224,10 @@ public class Unit
     public Unit(Transform transform)
     {
         this.transform = transform;
+    }
+    public Transform GetTransform()
+    {
+        return transform;
     }
     public void SetForward(Vector3 forward)
     {

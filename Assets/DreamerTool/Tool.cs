@@ -259,6 +259,7 @@ public class StateBaseTemplate<T>:StateBase
 }
 namespace DreamerTool.GameObjectPool
 {
+    using System.Linq;
     public static class GameObjectPoolManager
     {
         private static Dictionary<string, GameObjectPool> pools = new Dictionary<string, GameObjectPool>();
@@ -296,7 +297,7 @@ namespace DreamerTool.GameObjectPool
     }
     public class GameObjectPool
     {
-       
+        private List<GameObject> object_list = new List<GameObject>();
         private Queue<GameObject> object_pool_queue = new Queue<GameObject>();
         private GameObject _prefab;
 
@@ -304,7 +305,27 @@ namespace DreamerTool.GameObjectPool
         {
             this._prefab = _prefab;
         }
-
+        public virtual GameObject Get(Transform transform, float life_time)
+        {
+            GameObject get_object = null;
+            if (object_pool_queue.Count == 0)
+            {
+                get_object = GameObject.Instantiate(_prefab);
+                ObjectRecover _recover = get_object.AddComponent<ObjectRecover>();
+                _recover.recover_call_back = Remove;
+                object_list.Add(get_object);
+            }
+            else
+            {
+                get_object = object_pool_queue.Dequeue();
+            }
+            get_object.GetComponent<ObjectRecover>().Recover(life_time);
+            get_object.transform.parent = transform;
+            get_object.transform.localPosition = Vector3.zero;
+            get_object.transform.localScale = Vector3.one;
+            get_object.SetActive(true);
+            return get_object;
+        }
         public virtual GameObject Get(Vector3 pos,Quaternion rot, float life_time)
         {
             GameObject get_object = null;
@@ -319,9 +340,10 @@ namespace DreamerTool.GameObjectPool
                 get_object = object_pool_queue.Dequeue();
             }
             get_object.GetComponent<ObjectRecover>().Recover(life_time);
-            get_object.SetActive(true);
+             
             get_object.transform.position = pos;
             get_object.transform.rotation = rot;
+            get_object.SetActive(true);
             return get_object;
         }
         public virtual void Remove(GameObject tempObject)
@@ -329,9 +351,30 @@ namespace DreamerTool.GameObjectPool
             tempObject.SetActive(false);
             object_pool_queue.Enqueue(tempObject);
         }
-
+        public virtual void Remove(int id)
+        {
+            var tempObject = object_pool_queue.ToList().Find((a) => { return a.GetInstanceID() == id; } );
+            if (tempObject == null)
+                return;
+            tempObject.SetActive(false);
+            object_pool_queue.Enqueue(tempObject);
+        }
+        public void RecoverAll()
+        {
+            foreach (var item in object_list)
+            {
+                if(item.activeSelf)
+                item.GetComponent<ObjectRecover>().RecoverImmediately();
+            }
+           
+        }
         public void Clear()
         {
+            foreach (var item in object_list)
+            {
+                GameObject.Destroy(item);
+            }
+            object_list.Clear();
             object_pool_queue.Clear();
         }
     }

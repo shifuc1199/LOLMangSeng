@@ -29,9 +29,19 @@ public enum CampType
 public enum SkillExcuteType
 {
     Directivity,
-    NonDirectivity,
+    Point,
+    Line
+}
+public enum CallBackType
+{
+    Add,
+    Remove
 }
 
+public enum StatusType
+{
+    Q
+}
 public enum SkillType
 {
     Q,
