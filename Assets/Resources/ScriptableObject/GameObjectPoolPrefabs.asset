@@ -32,3 +32,6 @@ MonoBehaviour:
   - prefab_name: skill_q_hit
     prefab: {fileID: 1225301697868983358, guid: 6f3adf07ce8033a43812259fb64484a4,
       type: 3}
+  - prefab_name: eye
+    prefab: {fileID: 7658690097864274836, guid: 9f698d7258093cf468cc409d9459d2f6,
+      type: 3}

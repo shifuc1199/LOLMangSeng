@@ -6,9 +6,12 @@
 public enum HeroState
 {
     Idle,
-    Run,
-    Attack
+    MoveTo,
+    Attack,
+    PutEye,
+    SkillMoveTo
 }
+
 public enum AnimParamType
 {
     Bool,
@@ -49,3 +52,5 @@ public enum SkillType
     E,
     R
 }
+
+ 

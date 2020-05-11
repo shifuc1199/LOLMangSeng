@@ -53,6 +53,7 @@ public class HeroUnit : Unit
 
     Vector3 aimPos;
     public Unit selectEnemyUnit { get; private set; }
+
     public Dictionary<StatusType, Status>  statusDict = new Dictionary<StatusType, Status>();
     public Dictionary<SkillType, SkillModel> skillDict = new Dictionary<SkillType, SkillModel>() {
         { SkillType.Q,new SkillModel()},
@@ -91,10 +92,7 @@ public class HeroUnit : Unit
         this.rigi = rigi;
         this.anim = anim;
     }
-    public void SetGetStatus()
-    {
-        GameObjectPoolManager.GetPool("skill_q_hit").Get(transform, 3);
-    }
+ 
     public virtual void ExcuteSkill(SkillType skillType, object[] skillParam)
     {
         SetHeroState(HeroState.Idle);
@@ -140,15 +138,8 @@ public class HeroUnit : Unit
                 break;
         }
     }
-    public void MoveTo(Vector3 pos,float speed)
-    {
-        transform.MoveTo(pos, speed);
-    }
-    public override void MoveTo(Vector3 aimPos)
-    {
-        this.aimPos = aimPos;
-        SetHeroState(HeroState.Run);
-    }
+    private SkillCommoand currentSkill;
+     
     public void SetHeroState(HeroState state, params object[] param)
     {
         switch (state)
@@ -156,11 +147,21 @@ public class HeroUnit : Unit
             case HeroState.Idle:
                 PlayAnim(AnimParamType.Bool, "run", false);
                 break;
-            case HeroState.Run:
+            case HeroState.MoveTo:
+                this.aimPos = (Vector3)param[0];
                 PlayAnim(AnimParamType.Bool, "run", true);
                 break;
             case HeroState.Attack:
                 selectEnemyUnit = param[0] as Unit;
+                break;
+            case HeroState.PutEye:
+                this.aimPos = (Vector3)param[0];
+                PlayAnim(AnimParamType.Bool, "run", true);
+                break;
+            case HeroState.SkillMoveTo:
+                this.aimPos = (Vector3)param[0];
+                currentSkill = param[2] as SkillCommoand;
+                PlayAnim(AnimParamType.Bool, "run", true);
                 break;
             default:
                 break;
@@ -186,7 +187,7 @@ public class HeroUnit : Unit
         {
             case HeroState.Idle:
                 break;
-            case HeroState.Run:
+            case HeroState.MoveTo:
                 if(Vector3.Distance(transform.position,aimPos)<=0.1f)
                 {
                     SetHeroState(HeroState.Idle);
@@ -209,8 +210,27 @@ public class HeroUnit : Unit
                     return;
                 }
                 PlayAnim(AnimParamType.Bool, "run", true);
-                 
                 transform.position = Vector3.MoveTowards(transform.position, selectEnemyUnit.GetPosNoY(), Time.deltaTime * 2.5f);
+                break;
+            case HeroState.PutEye:
+                if (Vector3.Distance(transform.position, aimPos) <= 5f)
+                {
+                    AudioManager.Instance.PlayOneShot("eye");
+                    GameObjectPoolManager.GetPool("eye").Get(aimPos, Quaternion.identity, 5);
+                    SetHeroState(HeroState.Idle);
+                    return;
+                }
+                transform.forward = Vector3.Slerp(transform.forward, (aimPos - transform.position).normalized, Time.deltaTime * 20);
+                transform.position = Vector3.MoveTowards(transform.position, aimPos, Time.deltaTime * 2.5f);
+                break;
+            case HeroState.SkillMoveTo:
+                if (Vector3.Distance(transform.position, aimPos) <= 3)
+                {
+                    currentSkill.Execute();
+                    return;
+                }
+                transform.forward = Vector3.Slerp(transform.forward, (aimPos - transform.position).normalized, Time.deltaTime * 20);
+                transform.position = Vector3.MoveTowards(transform.position, aimPos, Time.deltaTime * 2.5f);
                 break;
             default:
                 break;

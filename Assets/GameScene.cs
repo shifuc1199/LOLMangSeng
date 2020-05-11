@@ -10,7 +10,7 @@ public class GameScene : MonoBehaviour
     void Awake()
     {
         GameObjectPoolManager.InitByScriptableObject();
-        
+ 
     }
     private void Start()
     {
