@@ -55,6 +55,22 @@ public class InputHandler : Singleton<InputHandler>
             }
 
         }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+
+            if (enemyUnit != null)
+            {
+                if (Vector3.Distance(enemyUnit.GetPosNoY(), controlUnit.GetPosNoY()) <= 3)
+                {
+                    return new SkillCommoand(controlUnit, SkillType.R, SkillExcuteType.Directivity, enemyUnit);
+                }
+                else
+                {
+                    return new SkillMoveToCommoand(controlUnit, enemyUnit.GetPos(), 3, new SkillCommoand(controlUnit, SkillType.R, SkillExcuteType.Directivity, enemyUnit));
+                }
+            }
+
+        }
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             var hit = GameStaticMethod.GetMouseRayCastHit(LayerMask.GetMask("Ground"));

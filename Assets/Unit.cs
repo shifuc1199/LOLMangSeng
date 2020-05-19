@@ -57,8 +57,16 @@ public class HeroUnit : Unit
     public Dictionary<StatusType, Status>  statusDict = new Dictionary<StatusType, Status>();
     public Dictionary<SkillType, SkillModel> skillDict = new Dictionary<SkillType, SkillModel>() {
         { SkillType.Q,new SkillModel()},
-        { SkillType.W,new SkillModel()}
+        { SkillType.W,new SkillModel()},
+        { SkillType.R,new SkillModel()}
     };
+    public void AddForce(Vector3 dir,float force)
+    {
+        if(rigi!=null)
+        {
+            rigi.AddForce(dir * force, ForceMode.Impulse);
+        }
+    }
     public void RemoveStatus(StatusType status)
     {
         if (!statusDict.ContainsKey(status))
@@ -113,6 +121,7 @@ public class HeroUnit : Unit
             case SkillType.E:
                 break;
             case SkillType.R:
+                skillDict[SkillType.R].SetSkillTarget(skillParam[1] as Unit);
                 break;
             default:
                 break;
@@ -257,6 +266,15 @@ public class Unit
     {
         return new Vector3(transform.position.x,0, transform.position.z);
     }
+    public Vector3 GetBack()
+    {
+        return -transform.forward;
+    }
+    public Vector3 GetForward()
+    {
+        return transform.forward;
+    }
+     
     public Vector3 GetPos()
     {
         return transform.position;

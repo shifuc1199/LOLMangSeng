@@ -4,6 +4,7 @@ using UnityEngine;
 using DreamerTool.GameObjectPool;
 public class HeroAnimationEvent : MonoBehaviour
 {
+    public Transform footPos;
      
     HeroUnit controlUnit;
    
@@ -32,6 +33,18 @@ public class HeroAnimationEvent : MonoBehaviour
     public void SkillWEnter()
     {
         AudioManager.Instance.PlayOneShot("skill_w");
+    }
+    public void OnSkillRUpdate()
+    {
+        var skillTargetUnit = controlUnit.skillDict[SkillType.R].GetSkillTarget();
+        controlUnit.SetForward((skillTargetUnit.GetPosNoY() - controlUnit.GetPosNoY()).normalized);
+    }
+    public void SkillRExcute()
+    {
+        GameObjectPoolManager.GetPool("skill_r").Get(footPos.position, transform.rotation, 1);
+        AudioManager.Instance.PlayOneShot("skill_r");
+        var skillTargetUnit = controlUnit.skillDict[SkillType.R].GetSkillTarget();
+        (skillTargetUnit as HeroUnit).AddForce(controlUnit.GetForward(), 7);
     }
     public void SkillWUpdate()
     {
